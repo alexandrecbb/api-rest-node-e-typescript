@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { StatusCodes } from 'http-status-codes';
 
 import { CitiesController } from '../controllers';
 
@@ -9,7 +8,7 @@ router.get('/', (_, res) => {
     return res.send('Rodando!');
 });
 
-router.post('/cities', CitiesController.createBodyValidator, CitiesController.create);
+router.post('/cities', CitiesController.createValidation, CitiesController.create);
 
 
 export { router };
