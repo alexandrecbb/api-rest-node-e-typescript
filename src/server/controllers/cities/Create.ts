@@ -1,14 +1,15 @@
-import { Request, Response } from 'express';
 import * as yup from 'yup';
-import { validation } from '../../shared/middleware';
+
+import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-interface ICity {
-    name: string;   
-}
+import { validation } from '../../shared/middleware';
+import { ICity } from '../../database/models';
+
+interface IBodyProps extends Omit<ICity, 'id'> {}
 
 export const createValidation = validation((getSchema) => ({
-    body: getSchema<ICity>(yup.object().shape({
+    body: getSchema<IBodyProps>(yup.object().shape({
         name: yup.string().required().min(3),      
     })),
     

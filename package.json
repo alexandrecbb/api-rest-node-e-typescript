@@ -7,7 +7,11 @@
     "test": "jest",
     "postinstall": "tsc",
     "production": "node ./build/index.js",
-    "start": "ts-node-dev ./src/index.ts"
+    "start": "ts-node-dev ./src/index.ts",
+    "knex:rollback-all": "knex --knexfile ./src/server/database/knex/Environment.ts migrate:rollback --all",
+    "knex:rollback": "knex --knexfile ./src/server/database/knex/Environment.ts migrate:rollback",
+    "knex:migrate": "knex --knexfile ./src/server/database/knex/Environment.ts migrate:latest",
+    "knex:seed": "knex --knexfile ./src/server/database/knex/Environment.ts seed:latest"
   },
   "author": "Alexandre Castelo Branco",
   "license": "ISC",
@@ -27,7 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
     "eslint": "^8.49.0",
-    "sqlite": "^5.0.1",
+    "sqlite3": "^5.1.6",
     "supertest": "^6.3.3",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
