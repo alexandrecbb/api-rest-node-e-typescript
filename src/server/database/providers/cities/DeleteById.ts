@@ -7,7 +7,7 @@ export const deleteById = async (id: number): Promise<void | Error> => {
         const result = await Knex(ETableNames.city)
             .where('id', '=', id)
             .del();
-        console.log(result);
+        
         if (result > 0) return;
 
         return new Error('Erro ao apagar o registro');
