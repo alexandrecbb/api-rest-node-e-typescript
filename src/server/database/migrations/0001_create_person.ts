@@ -1,0 +1,33 @@
+import { Knex } from 'knex';
+import { ETableNames } from '../ETableNames';
+
+
+export async function up(knex: Knex) {
+    return knex
+        .schema
+        .createTable(ETableNames.person, table => {
+            table.bigIncrements('id').primary().index();
+            table.string('fullName').index().notNullable();
+            table.string('email').unique().notNullable();
+            table
+                .string('cityId')
+                .index().notNullable()
+                .references('id')
+                .inTable(ETableNames.city)
+                .onUpdate('CASCADE')
+                .onDelete('RESTRICT');
+
+            table.comment('Tabela usada para armazenar pessoas do sistema');
+        })
+        .then(() => console.log(`Created table ${ETableNames.person}`));
+
+}
+
+
+export async function down(knex: Knex) {
+    return knex
+        .schema
+        .dropTable(ETableNames.person)
+        .then(() => console.log(`Dropped table ${ETableNames.person}`));
+}   
+
