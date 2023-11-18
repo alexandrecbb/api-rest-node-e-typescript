@@ -24,9 +24,9 @@ export const signIn = async (req: Request<{}, {}, IBodyProps>, res: Response) =>
 
     const { email, password } = req.body;
 
-    const result = await UsersProvider.getByEmail(email);
+    const user = await UsersProvider.getByEmail(email);
 
-    if(result instanceof Error) {
+    if(user instanceof Error) {
         return res.status(StatusCodes.UNAUTHORIZED).json(
             { errors: { 
                 default: 'Email ou senha inválidos' } 
@@ -34,7 +34,7 @@ export const signIn = async (req: Request<{}, {}, IBodyProps>, res: Response) =>
         );
     }
 
-    const passwordMatch  = await PasswordCrypto.verifyPassword(password, result.password);
+    const passwordMatch  = await PasswordCrypto.verifyPassword(password, user.password);
 
     if (!passwordMatch) {
         return res.status(StatusCodes.UNAUTHORIZED).json(
@@ -44,7 +44,7 @@ export const signIn = async (req: Request<{}, {}, IBodyProps>, res: Response) =>
         );
     }else{
 
-        const accessToken = JWTService.sign({uid: result.id});
+        const accessToken = JWTService.sign({uid: user.id});
         if(accessToken === 'JWT_SECRET_NOT_FOUND') {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
                 { errors: {

@@ -4,19 +4,44 @@ import { testServer } from '../jest.setup';
 
 
 describe('people - Create', () => {
+
+    let accessToken = '';
+
+    beforeAll(async () => {
+        const email = 'creat-people@gmail.com';
+        await testServer.post('/register').send({ name: 'Jorge', password: '123456', email });
+        const signInRes = await testServer.post('/enter').send({ password: '123456', email });
+        accessToken = signInRes.body.accessToken;
+    });
+
     let cityId: number | undefined = undefined;
     beforeAll(async () => {
         const resCity = await testServer
             .post('/cities')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({ name: 'Teste' });
 
         cityId = resCity.body;
+    });
+
+    it('Criar sem usar token de autenticação', async () => {
+        const res1 = await testServer
+            .post('/people')
+            .send({
+                cityId: 1,
+                email: 'juca@gmail.com',
+                fullName: 'Juca silva',
+            });
+
+        expect(res1.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+        expect(res1.body).toHaveProperty('errors.default');
     });
 
 
     it('Cria registro', async () => {
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 cityId,
                 email: 'juca@gmail.com',
@@ -30,6 +55,7 @@ describe('people - Create', () => {
     it('Cadastra registro 2', async () => {
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 cityId,
                 fullName: 'Juca silva',
@@ -43,6 +69,7 @@ describe('people - Create', () => {
     it('Tenta criar registro com email duplicado', async () => {
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 cityId,
                 fullName: 'Juca silva',
@@ -53,6 +80,7 @@ describe('people - Create', () => {
 
         const res2 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 cityId,
                 fullname: 'duplicado',
@@ -65,6 +93,7 @@ describe('people - Create', () => {
     it('Tenta criar registro com fullName muito curto', async () => {
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 cityId,
                 email: 'juca@gmail.com',
@@ -78,6 +107,7 @@ describe('people - Create', () => {
     it('Tenta criar registro sem fullName', async () => {
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 cityId,
                 email: 'juca@gmail.com',
@@ -90,6 +120,7 @@ describe('people - Create', () => {
     it('Tenta criar registro sem email', async () => {
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 cityId,
                 fullName: 'Juca da Silva',
@@ -102,6 +133,7 @@ describe('people - Create', () => {
     it('Tenta criar registro com email inválido', async () => {
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 cityId,
                 email: 'juca gmail.com',
@@ -115,6 +147,7 @@ describe('people - Create', () => {
     it('Tenta criar registro sem cityId', async () => {
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 email: 'juca@gmail.com',
                 fulName: 'Juca da Silva',
@@ -127,6 +160,7 @@ describe('people - Create', () => {
     it('Tenta criar registro com cityId inválido', async () => {
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 cityId: 'teste',
                 email: 'juca@gmail.com',
@@ -136,11 +170,12 @@ describe('people - Create', () => {
         expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
         expect(res1.body).toHaveProperty('errors.body.cityId');
     });
-    
+
     it('Tenta criar registro sem enviar nenhuma propriedade', async () => {
 
         const res1 = await testServer
             .post('/people')
+            .set({ Authorization: `Bearer ${accessToken}` })
             .send({});
 
         expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
